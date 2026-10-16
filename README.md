@@ -16,7 +16,11 @@ Needs Python 3.11+.
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp config.example.toml config.toml   # then add your calendar URLs
+chmod 600 config.toml                 # it holds secrets (Things password, calendar URLs)
 ```
+
+Keep `credentials.json` at `chmod 600` too. `token.json` and `.things_cache.json` are
+written that way automatically.
 
 Let non-root users talk to the printer over USB:
 

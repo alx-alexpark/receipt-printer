@@ -29,6 +29,9 @@ FONT_A_WIDTH = 12  # dots per character at size 1
 
 # fancy punctuation the printer's code pages may not have
 PLAIN = str.maketrans({"–": "-", "—": "-", "‘": "'", "’": "'", "“": '"', "”": '"', "…": "..."})
+# control characters (ESC, GS, DLE, ...) are printer commands: calendar invites
+# and to-do titles must not be able to send them, so they're dropped
+PLAIN.update({c: None for c in [*range(0x20), *range(0x7F, 0xA0)]})
 
 
 def blocked_columns(size):

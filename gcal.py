@@ -5,6 +5,7 @@ then run `./briefing --login` on a machine with a browser. That saves token.json
 which can be copied to a headless server and refreshes itself from then on.
 """
 import datetime as dt
+import os
 from pathlib import Path
 
 from google.auth.transport.requests import Request
@@ -15,10 +16,18 @@ from googleapiclient.discovery import build
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
 
+def _save_token(token_path, creds):
+    """Write token.json readable only by us: it holds a refresh token."""
+    fd = os.open(token_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    os.fchmod(fd, 0o600)  # also tighten a token.json that already existed
+    with os.fdopen(fd, "w") as f:
+        f.write(creds.to_json())
+
+
 def login(credentials_path, token_path):
     flow = InstalledAppFlow.from_client_secrets_file(str(credentials_path), SCOPES)
     creds = flow.run_local_server(port=0)
-    Path(token_path).write_text(creds.to_json())
+    _save_token(token_path, creds)
 
 
 def _creds(token_path):
@@ -28,7 +37,7 @@ def _creds(token_path):
     creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)
     if not creds.valid:
         creds.refresh(Request())
-        token_path.write_text(creds.to_json())
+        _save_token(token_path, creds)
     return creds
 
 

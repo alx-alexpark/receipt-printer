@@ -10,6 +10,7 @@ the current tasks, and cache the result so later runs only fetch new changes.
 import base64
 import datetime as dt
 import json
+import os
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -80,7 +81,11 @@ def sync(email, password, cache_path):
         if not page["items"] or cache["index"] >= page["current-item-index"]:
             break
 
-    cache_path.write_text(json.dumps(cache))
+    # readable only by us: the history key in it is enough to read all of Things
+    fd = os.open(cache_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    os.fchmod(fd, 0o600)  # also tighten a cache that already existed
+    with os.fdopen(fd, "w") as f:
+        json.dump(cache, f)
     return cache["objects"]
 
 
