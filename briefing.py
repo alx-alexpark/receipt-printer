@@ -25,6 +25,8 @@ import things_cloud
 from receipt import find_printer, flow_rows, layout, print_lines, print_text, two_columns
 
 HERE = Path(__file__).resolve().parent
+# config.toml, token.json and the Things cache; systemd sets STATE_DIRECTORY for services
+STATE = Path(os.environ.get("STATE_DIRECTORY", HERE))
 
 # https://open-meteo.com/en/docs (WMO weather interpretation codes)
 WEATHER_CODES = {
@@ -128,7 +130,7 @@ def calendar_events(cfg, day, tz):
         google = cfg["google"]
         try:
             g_found, g_errors = gcal.events(
-                HERE / google.get("token", "token.json"), start, end, tz,
+                STATE / google.get("token", "token.json"), start, end, tz,
                 exclude=google.get("exclude", []),
             )
             found += g_found
@@ -225,7 +227,7 @@ def things_sections(cfg, day, demo=False):
             return []
         password = os.environ.get("THINGS_PASSWORD") or things.get("password")
         try:
-            objects = things_cloud.sync(things["email"], password, HERE / ".things_cache.json")
+            objects = things_cloud.sync(things["email"], password, STATE / ".things_cache.json")
         except Exception as e:
             return [("Today", [("", f"(couldn't load Things: {e})")])]
         today_list, inbox_list = things_cloud.today_list(objects, day), things_cloud.inbox_list(objects)
@@ -273,7 +275,7 @@ def main():
     p = argparse.ArgumentParser(description="Print the daily briefing.")
     p.add_argument("--dry-run", action="store_true", help="show it instead of printing")
     p.add_argument("--date", type=dt.date.fromisoformat, help="YYYY-MM-DD (default: today)")
-    p.add_argument("--config", default=HERE / "config.toml", type=Path)
+    p.add_argument("--config", default=STATE / "config.toml", type=Path)
     p.add_argument("--demo", action="store_true",
                    help="use made-up to-dos instead of your real Things lists")
     p.add_argument("--login", action="store_true",
@@ -281,7 +283,7 @@ def main():
     args = p.parse_args()
 
     if args.login:
-        gcal.login(HERE / "credentials.json", HERE / "token.json")
+        gcal.login(HERE / "credentials.json", STATE / "token.json")
         print("Saved token.json")
         return
 

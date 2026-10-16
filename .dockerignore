@@ -1,0 +1,7 @@
+config.toml
+token.json
+credentials.json
+.things_cache.json
+.venv/
+__pycache__/
+.git/
