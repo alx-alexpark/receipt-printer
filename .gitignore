@@ -1,0 +1,7 @@
+config.toml
+.things_cache.json
+.venv/
+__pycache__/
+credentials.json
+token.json
+.DS_Store

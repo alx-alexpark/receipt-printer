@@ -1,0 +1,30 @@
+timezone = "America/New_York"
+
+# Things 3 Today list, read from Things Cloud (unofficial, read-only).
+# Put the password here or in the THINGS_PASSWORD environment variable.
+# Remove this section to leave todos off the receipt.
+[things]
+email = "you@example.com"
+# password = "..."
+
+[location]
+name = "New Haven"
+latitude = 41.30815
+longitude = -72.92816
+
+# Google Calendar via OAuth: reads every calendar ticked in Google Calendar's
+# sidebar. Needs credentials.json + `./briefing --login` (see README).
+[google]
+# token = "token.json"
+# exclude = ["Holidays in United States"]   # calendar names to skip
+
+# Or/also: individual iCal feeds, one block per calendar. Get each URL from Google Calendar:
+# Settings > (pick the calendar) > Integrate calendar > "Secret address in iCal format".
+# Keep these private: anyone with the URL can read that calendar.
+[[calendars]]
+name = "Personal"
+url = "https://calendar.google.com/calendar/ical/YOUR_ID/private-SECRET/basic.ics"
+
+[[calendars]]
+name = "US Holidays"
+url = "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics"

@@ -1,0 +1,7 @@
+python-escpos
+pyusb
+pillow
+icalendar
+recurring-ical-events
+google-api-python-client
+google-auth-oauthlib
