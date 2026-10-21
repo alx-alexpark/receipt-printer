@@ -27,7 +27,7 @@ CLIENT_INFO = base64.b64encode(json.dumps({
 TITLE, STATUS, SCHEDULE, START_DATE, DEADLINE = "tt", "ss", "st", "sr", "dd"
 TYPE, TRASHED, PROJECTS, TODAY_INDEX, EVENING, REPEATER = "tp", "tr", "pr", "ti", "sb", "rr"
 OPEN = 0  # status
-INBOX, ANYTIME = 0, 1  # schedule
+INBOX, ANYTIME, SOMEDAY = 0, 1, 2  # schedule (Upcoming is Someday with a start date)
 TODO, PROJECT = 0, 1  # type (2 = heading)
 INDEX = "ix"
 
@@ -104,7 +104,9 @@ def today_list(objects, day):
         if t.get(TYPE) not in (TODO, PROJECT):
             continue
         start, deadline = _date(t.get(START_DATE)), _date(t.get(DEADLINE))
-        started = t.get(SCHEDULE) == ANYTIME and start and start <= day
+        # a Things app moves Upcoming to-dos into Today when it next opens on or
+        # after their date, so until then they're still scheduled as Someday
+        started = t.get(SCHEDULE) in (ANYTIME, SOMEDAY) and start and start <= day
         due = deadline and deadline <= day
         if not (started or due):
             continue
